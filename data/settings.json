@@ -1,0 +1,9 @@
+{
+  "defaultBoardSize": "6x6",
+  "defaultCardCharacter": "letters",
+  "colors": {
+    "closed": "#aaa",
+    "open": "#f0e68c",
+    "found": "#98fb98"
+  }
+}
