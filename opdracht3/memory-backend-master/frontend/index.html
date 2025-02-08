@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,38 +18,77 @@
         #result { font-size:2rem; text-align:center; }
     </style>
 </head>
+
 <body>
 
-    <h2>Frontend demo 👋</h2>
+<h3>Top 5 Scores</h3>
+<ul id="scoreboard"></ul>
 
-    <p>Start in deze directory een nieuwe host binnen hetzelfde domein als waarop je de backend hebt draaien, maar op een andere poort (bijvoorbeeld <tt>php -S localhost:8080</tt>. Als je de frontend op een ander domein draait, of gewoon als bestand op je file-system opent, krijg je <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors">CORS-errors</a>.</p>
-
-    <p>Deze pagina checkt de verbinding met de backend. Als je hieronder de datum van vandaag te zien krijgt, is de verbinding ok. Er wordt namelijk een call gedaan naar <tt>localhost:8000/frontend</tt>, die de datum van vandaag als json teruggeeft.</p>
-
-    <p>Je kunt hetzelfde ook bereiken door op de knop hieronder te klikken. Check eventueel de console als je denkt dat er dingen niet goed gaan.</p>
-        
-    <form>
-        <button id="btn" value="">Check de connectie</button>
-    </form>
-
-    <p id="result"></p>
-    
-</body>
+<button id="btn">Check de connectie</button>
+<p id="result"></p>
 
 <script>
+    // Wacht tot de volledige pagina is geladen voordat het script wordt uitgevoerd
+    document.addEventListener('DOMContentLoaded', function () {
+        checkConnection();
+        fetchTopScores();
+    });
 
-    const check = () => {
-        fetch('http://localhost:8000/frontend')
-        .then( resp => resp.json() )
-        .then( json => {
-            console.log(json)
-            let datum = new Date(json['date']).toLocaleDateString('NL-nl', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'} )
-            document.getElementById('result').innerHTML = json['message']
-            document.getElementById('result').innerHTML += `<br/>De huidige datum is ${datum}`
-        })
+    // Functie om de backend-verbinding te testen
+    function checkConnection() {
+        fetch('http://127.0.0.1:8000/frontend')
+            .then(response => response.json())
+            .then(json => {
+                console.log(json);
+                let datum = new Date(json['date']).toLocaleDateString('NL-nl', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                document.getElementById('result').innerHTML = json['message'] + `<br/>De huidige datum is ${datum}`;
+            })
+            .catch(error => console.error("Fout bij ophalen van verbinding:", error));
     }
 
-    check()
-    document.getElementById('btn').addEventListener('click', c => check() )
+    // Eventlistener voor de knop
+    document.getElementById('btn').addEventListener('click', checkConnection);
+
+    // Functie om de top 5 scores op te halen en weer te geven
+    function fetchTopScores() {
+        fetch('http://127.0.0.1:8000/scores')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Ontvangen scores:", data);
+
+                const scoreList = document.getElementById('scoreboard');
+                scoreList.innerHTML = ''; // Leeg de lijst
+
+                if (data.length === 0) {
+                    console.warn("Geen scores gevonden in de database!");
+                    scoreList.innerHTML = "<li>Geen scores beschikbaar</li>";
+                    return;
+                }
+
+                // Sorteer scores op hoogste score eerst
+                const sortedScores = data.sort((a, b) => b.score - a.score).slice(0, 5);
+
+                // Voeg scores toe aan de lijst
+                sortedScores.forEach((player, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${index + 1}. ${player.username} - ${player.score} punten`;
+                    scoreList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error("Fout bij ophalen van scores:", error));
+    }
 </script>
+
+</body>
 </html>
