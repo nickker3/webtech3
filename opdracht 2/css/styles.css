@@ -1,0 +1,144 @@
+/* Algemene styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Zorgt ervoor dat de inhoud in het midden staat */
+    min-height: 100vh; /* Zorgt ervoor dat het hele scherm benut wordt */
+    text-align: center;
+}
+
+main {
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Zorgt ervoor dat de inhoud in het midden staat */
+}
+
+
+#start-game {
+    font-size: 1.2em;
+    padding: 15px 25px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#start-game:hover {
+    background-color: #45a049;
+}
+
+
+header {
+    text-align: center;
+    margin: 20px 0;
+}
+
+
+
+h1, h2 {
+    color: #333;
+}
+
+/* Spel status */
+#game-status h2 {
+    color: #333;
+}
+
+.grid .card {
+    border: 2px solid #ccc;
+}
+
+
+/* Timer */
+#card-timer {
+    height: 20px;
+    width: 100%;
+    background-color: lightgray;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+/* Speelveld */
+.grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Voorkomt dat de grid te breed wordt */
+    max-width: 100%;
+}
+
+@media (max-width: 480px) {
+    .grid {
+        grid-template-columns: repeat(4, 1fr); /* Op kleinere schermen minder kolommen */
+    }
+}
+
+
+.card {
+    width: 100px; /* Vaste breedte */
+    height: 100px; /* Vaste hoogte */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem; /* Letter blijft goed leesbaar */
+    transition: background-color 0.2s ease-in-out;
+    position: relative;
+    border: 2px solid #333; /* Zorgt ervoor dat de randen consistent blijven */
+    overflow: hidden; /* Voorkomt dat extra inhoud de grootte verandert */
+}
+
+.card:active {
+    transform: scale(0.95); /* Voorkomt dat de kaart groter wordt */
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.card.closed {
+    background-color: #aaa;
+}
+
+.card.open {
+    background-color: #f0e68c; /* Gele kleur */
+    font-size: 2rem; /* Zorg ervoor dat de letter niet groter wordt */
+}
+
+.card.found {
+    background-color: #98fb98; /* Groene kleur voor gevonden paren */
+}
+
+/* Instellingen */
+#settings {
+    margin-top: 20px;
+}
+
+.color-btn {
+    margin: 5px 0;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.color-btn:hover {
+    background-color: #ddd;
+}
+
+/* Responsiviteit */
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(6, 1fr);
+
+    }
+}

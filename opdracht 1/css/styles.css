@@ -1,0 +1,102 @@
+/* Algemene styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    text-align: center;
+    margin: 20px 0;
+}
+
+main {
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+/* Spel status */
+#game-status {
+    margin-bottom: 20px;
+}
+
+/* Timer */
+#card-timer {
+    height: 20px;
+    width: 100%;
+    background-color: lightgray;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+/* Speelveld */
+.grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+}
+
+@media (max-width: 480px) {
+    .grid {
+        grid-template-columns: repeat(4, 1fr); /* Op kleinere schermen minder kolommen */
+    }
+}
+
+
+.card {
+    width: 100%;
+    padding-top: 100%; /* Vierkant formaat behouden */
+    position: relative;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: transform 0.2s ease-in-out; /* Voeg een subtiele animatie toe */
+}
+
+.card:active {
+    transform: scale(0.95); /* Kleinere schaalverandering om onrustige layout te voorkomen */
+}
+
+
+.card.closed {
+    background-color: #aaa;
+}
+
+.card.open {
+    background-color: #f0e68c;
+}
+
+.card.found {
+    background-color: #98fb98;
+}
+
+/* Instellingen */
+#settings {
+    margin-top: 20px;
+}
+
+.color-btn {
+    margin: 5px 0;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.color-btn:hover {
+    background-color: #ddd;
+}
+
+/* Responsiviteit */
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}

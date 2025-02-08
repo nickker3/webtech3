@@ -1,0 +1,59 @@
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Spel</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <h1>Memory Spel</h1>
+</header>
+
+<main>
+    <!-- Spelstatus -->
+    <section id="game-status">
+        <h2>Spel Status</h2>
+        <p>Verlopen tijd: <span id="elapsed-time">00:00</span></p>
+        <p>Gevonden paren: <span id="pairs-found">0</span></p>
+    </section>
+
+    <!-- Speelveld -->
+    <section id="game-board">
+        <h2>Speelveld</h2>
+        <div class="grid" id="grid">
+            <!-- Dynamische kaarten worden hier geladen -->
+        </div>
+    </section>
+
+    <!-- Feedback -->
+    <section id="game-feedback">
+        <div id="game-message" aria-live="polite"></div>
+    </section>
+
+    <!-- Start spel knop -->
+    <p>Welkom bij het Memory Spel! Klik op start om te beginnen.</p>
+    <button id="start-game">Start Spel</button>
+</main>
+<!-- Instellingen -->
+<section id="settings">
+    <h2>Instellingen</h2>
+    <label for="board-size">Speelbord afmetingen:</label>
+    <label for="card-color">Kies kaartkleur:</label>
+    <input type="color" id="card-color" value="#aaa">
+
+    <select id="board-size">
+        <option value="4x4">2x2</option>
+        <option value="4x4">4x4</option>
+        <option value="6x6" selected>6x6</option>
+        <option value="8x8">8x8</option>
+    </select>
+</section>
+<footer>
+    <p>Memory Spel - Veel speelplezier!</p>
+</footer>
+<script src="js/main.js"></script>
+<script src="js/timer.js"></script>
+
+</body>
+</html>
