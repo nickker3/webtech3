@@ -1,40 +1,35 @@
 <?php
 namespace App\EventListener;
 
-
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-// Toegevoegd om de userid in de header van de JWT te krijgen.
-// https://github.com/lexik/LexikJWTAuthenticationBundle/blob/2.x/Resources/doc/2-data-customization.rst
 class JWTCreatedListener {
-    private $requestStack;
+    private RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
     }
 
-
     public function onJWTCreated(JWTCreatedEvent $event)
     {
+        $user = $event->getUser(); // Haal de gebruiker op
+        if (!method_exists($user, 'getId')) {
+            throw new \RuntimeException('De methode getId() bestaat niet in de Player entity.');
+        }
+
         $payload = $event->getData();
-        $payload['sub'] = $event->getUser()->id;
+        $payload['sub'] = $user->getId(); // ✅ Gebruik de getter
         $payload['iss'] = 'memory backend';
 
         $event->setData($payload);
 
-        // @Deprecated
-        // foutje, deze data moet in de payload, niet in de header.
-        // dit zit er nog in voor backward compatibility
-        //https://www.rfc-editor.org/rfc/rfc7519#section-4.1
+        // Voeg extra info toe aan de header (voor backward compatibility)
         $header = $event->getHeader();
-        $header['sub'] =  $event->getUser()->id;
+        $header['sub'] = $user->getId(); // ✅ Gebruik de getter
         $header['iss'] = 'memory backend';
 
         $event->setHeader($header);
     }
 }
-
-
-

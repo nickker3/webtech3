@@ -2,9 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registratie</title>
+    <style>
+        body {font-family: Arial, Helvetica, sans-serif; text-align: center;}
+        form {border: 3px solid #f1f1f1; display: inline-block; padding: 20px; text-align: left;}
+        input[type=text], input[type=email], input[type=password] {
+            width: 100%; padding: 12px 20px; margin: 8px 0; display: inline-block;
+            border: 1px solid #ccc; box-sizing: border-box;
+        }
+        button { background-color: #04AA6D; color: white; padding: 14px 20px; margin: 8px 0;
+            border: none; cursor: pointer; width: 100%; }
+        button:hover { opacity: 0.8; }
+        .container { padding: 16px; }
+    </style>
 </head>
 <body>
+
+<h2>Registreer een speler</h2>
+<form id="registerForm">
+    <label for="username"><b>Gebruikersnaam</b></label>
+    <input type="text" id="username" placeholder="Voer een gebruikersnaam in" required>
+
+    <label for="email"><b>Email</b></label>
+    <input type="email" id="email" placeholder="Voer je e-mailadres in" required>
+
+    <label for="password"><b>Wachtwoord</b></label>
+    <input type="password" id="password" placeholder="Voer een wachtwoord in" required>
+
+    <button type="submit">Registreren</button>
+</form>
+
+<p id="result"></p>
+
+<script>
+    document.getElementById("registerForm").addEventListener("submit", function(event) {
+        event.preventDefault();  // Voorkom standaard form-verzending
+
+        const username = document.getElementById("username").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const requestData = { username, email, password };
+
+        fetch("http://127.0.0.1:8000/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestData)
+        })
+            .then(response => {
+                if (response.status === 201) {
+                    document.getElementById("result").innerHTML = "✅ Registratie succesvol!";
+                    document.getElementById("registerForm").reset();
+                } else {
+                    throw new Error("❌ Registratie mislukt. Probeer een andere gebruikersnaam.");
+                }
+            })
+            .catch(error => {
+                console.error("Fout bij registreren:", error);
+                document.getElementById("result").innerHTML = error.message;
+            });
+    });
+</script>
 
 </body>
 </html>

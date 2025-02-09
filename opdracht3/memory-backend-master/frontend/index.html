@@ -21,6 +21,15 @@
 
 <body>
 
+<div id="navbar"></div>
+<script>
+    fetch("navbar.html")
+        .then(response => response.text())
+        .then(data => document.getElementById("navbar").innerHTML = data);
+</script>
+
+
+
 <h3>Top 5 Scores</h3>
 <ul id="scoreboard"></ul>
 

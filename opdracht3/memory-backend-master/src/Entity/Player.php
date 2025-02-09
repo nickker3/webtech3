@@ -5,34 +5,42 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\GeneratedValue;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\OneToMany;
-use Doctrine\ORM\Mapping\ManyToMany;
-use Doctrine\ORM\Mapping\JoinColumn;
-use Doctrine\ORM\Mapping\InverseJoinColumn;
-use Doctrine\ORM\Mapping\JoinTable;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[Entity]
+#[ORM\Entity]
 #[ApiResource]
-class Player implements \JsonSerializable, UserInterface, PasswordAuthenticatedUserInterface {
-    #[Column(unique:true)] #[Id] #[GeneratedValue] public int $id;
-    #[Column(name:'name')] public string $username;
-    #[Column] public string $email;
-    #[Column] public string $password_hash;
-    #[Column(nullable:true)] public string $preferred_api = '';
-    #[Column(nullable:true)] public string $preferred_color_closed = '';
-    #[Column(nullable:true)] public string $preferred_color_found = '';
+class Player implements \JsonSerializable, UserInterface, PasswordAuthenticatedUserInterface
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    #[ManyToMany(targetEntity:Game::class, cascade: ["persist"])]
-    #[JoinTable(name:"player_games")]
-    #[JoinColumn(name: "player_id", referencedColumnName: "id")]
-    #[InverseJoinColumn(name: "game_id", referencedColumnName: "id", unique:true)]
-    private $games;
+    #[ORM\Column(name: "name", unique: true)]
+    private string $username;
+
+    #[ORM\Column(type: "string", unique: true)]
+    private string $email;
+
+    #[ORM\Column(type: "string")]
+    private string $password_hash;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $preferred_api = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $preferred_color_closed = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $preferred_color_found = null;
+
+    #[ORM\ManyToMany(targetEntity: Game::class, cascade: ["persist"])]
+    #[ORM\JoinTable(name: "player_games")]
+    #[ORM\JoinColumn(name: "player_id", referencedColumnName: "id")]
+    #[ORM\InverseJoinColumn(name: "game_id", referencedColumnName: "id", unique: true)]
+    private Collection $games;
 
     public function __construct(string $username, string $email, string $password_hash)
     {
@@ -42,40 +50,24 @@ class Player implements \JsonSerializable, UserInterface, PasswordAuthenticatedU
         $this->games = new ArrayCollection();
     }
 
-    public function addGame(Game $game) {
-        $this->games[] = $game;
+    public function getId(): int
+    {
+        return $this->id;
     }
 
-    public function getPreferences():array {
-        return [
-            'preferred_api' => $this->preferred_api,
-            'color_closed' => $this->preferred_color_closed,
-            'color_found' => $this->preferred_color_found
-        ];
+    public function getUsername(): string
+    {
+        return $this->username;
     }
 
-    public function setPreferences(array $params) {
-        $this->preferred_api = $params['api'];
-        $this->preferred_color_found = $params['color_found'];
-        $this->preferred_color_closed = $params['color_closed'];
+    public function getEmail(): string
+    {
+        return $this->email;
     }
 
-    public function getGames():Collection {
-        $t = new ArrayCollection();
-        foreach($this->games as $g) {
-            $t->add($g->jsonSerialize());
-        }
-        return $t;
-    }
-
-    public function jsonSerialize():mixed {
-        $games = $this->getGames()->toArray();
-        return array(
-            'id' => $this->id,
-            'name' => $this->username,
-            'email' => $this->email,
-            'games' => $games
-        );
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
     }
 
     public function getPassword(): ?string
@@ -86,17 +78,62 @@ class Player implements \JsonSerializable, UserInterface, PasswordAuthenticatedU
     public function getRoles(): array
     {
         $roles = ['ROLE_USER'];
-        if ($this->username=='Henk') $roles[] = 'ROLE_ADMIN';
+        if ($this->username === 'Henk') {
+            $roles[] = 'ROLE_ADMIN';
+        }
         return $roles;
     }
 
     public function eraseCredentials()
     {
-        // TODO: Implement eraseCredentials() method.
+        // Niet nodig voor dit project, maar verplicht door UserInterface
     }
 
     public function getUserIdentifier(): string
     {
         return $this->username;
+    }
+
+    public function getPreferredApi(): ?string
+    {
+        return $this->preferred_api;
+    }
+
+    public function setPreferredApi(?string $api): void
+    {
+        $this->preferred_api = $api;
+    }
+
+    public function getPreferredColorFound(): ?string
+    {
+        return $this->preferred_color_found;
+    }
+
+    public function setPreferredColorFound(?string $color): void
+    {
+        $this->preferred_color_found = $color;
+    }
+
+    public function getPreferredColorClosed(): ?string
+    {
+        return $this->preferred_color_closed;
+    }
+
+    public function setPreferredColorClosed(?string $color): void
+    {
+        $this->preferred_color_closed = $color;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->username,
+            'email' => $this->email,
+            'preferred_api' => $this->preferred_api,
+            'color_found' => $this->preferred_color_found,
+            'color_closed' => $this->preferred_color_closed,
+            'games' => $this->games->toArray(),
+        ];
     }
 }

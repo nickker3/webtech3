@@ -40,22 +40,38 @@ class DefaultController extends AbstractController {
         return new JsonResponse($scores);
     }
 
-    #[Route('/register', methods: ['POST'])]
-    public function register(ManagerRegistry $doctrine): Response {
-        try {
-            $params = json_decode(Request::createFromGlobals()->getContent(), true);
-            $pw = password_hash($params['password'], PASSWORD_DEFAULT);
-            $player = new Player($params['username'], $params['email'], $pw);
-            $em = $doctrine->getManager();
-            $em->persist($player);
-            $em->flush();
-            return new Response("", 201, ["Location" => "/player/$player->id"]);
-        } catch (\ErrorException $e) {
-            ob_start();
-            echo $e->getMessage();
-            echo "\n\n";
-            echo $e->getTraceAsString();
-            return new Response(ob_get_clean(),400);
+#[Route('/register', methods: ['POST'])]
+public function register(ManagerRegistry $doctrine, Request $request): Response {
+    try {
+        $params = json_decode($request->getContent(), true);
+
+        if (!isset($params['username'], $params['email'], $params['password'])) {
+            return new JsonResponse(["error" => "Vul alle velden in"], 400);
         }
+
+        $em = $doctrine->getManager();
+
+        // Controleer of de gebruikersnaam of e-mail al bestaat
+        if ($em->getRepository(Player::class)->findOneBy(['username' => $params['username']])) {
+            return new JsonResponse(["error" => "Gebruikersnaam bestaat al"], 400);
+        }
+
+        if ($em->getRepository(Player::class)->findOneBy(['email' => $params['email']])) {
+            return new JsonResponse(["error" => "E-mail is al in gebruik"], 400);
+        }
+
+        // Wachtwoord hashen en opslaan
+        $hashedPassword = password_hash($params['password'], PASSWORD_DEFAULT);
+        $player = new Player($params['username'], $params['email'], $hashedPassword);
+
+        $em->persist($player);
+        $em->flush();
+
+        return new JsonResponse(["message" => "Speler geregistreerd!", "id" => $player->getId()], 201);
+    } catch (\Exception $e) {
+        return new JsonResponse(["error" => $e->getMessage()], 400);
     }
+}
+
+
 }

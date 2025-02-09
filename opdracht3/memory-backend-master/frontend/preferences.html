@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voorkeuren Instellen</title>
+    <style>
+        body { font-family: Arial, Helvetica, sans-serif; text-align: center; }
+        form { border: 3px solid #f1f1f1; display: inline-block; padding: 20px; text-align: left; }
+        label, select, input { display: block; margin: 10px auto; width: 80%; }
+        button { background-color: #04AA6D; color: white; padding: 14px 20px; margin: 8px 0;
+            border: none; cursor: pointer; width: 100%; }
+        button:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+<div id="navbar"></div>
+<script>
+    fetch("navbar.html")
+        .then(response => response.text())
+        .then(data => document.getElementById("navbar").innerHTML = data);
+</script>
+
+<h2>Voorkeuren Instellen</h2>
+<form id="preferencesForm">
+    <label for="apiSelect"><b>Favoriete plaatjes-API</b></label>
+    <select id="apiSelect">
+        <option value="unsplash">Unsplash</option>
+        <option value="pexels">Pexels</option>
+        <option value="pixabay">Pixabay</option>
+    </select>
+
+    <label for="colorFound"><b>Kleur voor gevonden kaartjes</b></label>
+    <input type="color" id="colorFound" value="#00ff00">
+
+    <label for="colorClosed"><b>Kleur voor gesloten kaarten</b></label>
+    <input type="color" id="colorClosed" value="#ff0000">
+
+    <button type="submit">Voorkeuren opslaan</button>
+</form>
+
+<h2>Wijzig e-mail</h2>
+<label for="email"><b>Nieuwe e-mail</b></label>
+<input type="email" id="email" placeholder="Voer je nieuwe e-mail in" required>
+<button type="button" id="updateEmailBtn">E-mail bijwerken</button>
+
+<p id="result"></p>
+
+<script src="fetchInterceptor.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Haal huidige voorkeuren en e-mail op
+        fetch("http://127.0.0.1:8000/api/player/preferences")
+            .then(response => response.json())
+            .then(data => {
+                if (data.preferred_api) document.getElementById("apiSelect").value = data.preferred_api;
+                if (data.color_found) document.getElementById("colorFound").value = data.color_found;
+                if (data.color_closed) document.getElementById("colorClosed").value = data.color_closed;
+            })
+            .catch(error => console.error("Fout bij ophalen van voorkeuren:", error));
+
+        fetch("http://127.0.0.1:8000/api/player/email")
+            .then(response => response.json())
+            .then(data => {
+                if (data.email) document.getElementById("email").value = data.email;
+            })
+            .catch(error => console.error("Fout bij ophalen van e-mail:", error));
+    });
+
+    // Voorkeuren opslaan
+    document.getElementById("preferencesForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const preferences = {
+            api: document.getElementById("apiSelect").value,
+            color_found: document.getElementById("colorFound").value,
+            color_closed: document.getElementById("colorClosed").value
+        };
+
+        fetch("http://127.0.0.1:8000/api/player/preferences", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(preferences)
+        })
+            .then(response => response.json())
+            .then(() => {
+                document.getElementById("result").innerHTML = "✅ Voorkeuren opgeslagen!";
+            })
+            .catch(() => {
+                document.getElementById("result").innerHTML = "❌ Fout bij opslaan.";
+            });
+    });
+
+    // E-mail updaten
+    document.getElementById("updateEmailBtn").addEventListener("click", function() {
+        const newEmail = document.getElementById("email").value;
+
+        fetch("http://127.0.0.1:8000/api/player/email", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: newEmail })
+        })
+            .then(response => {
+                if (response.status === 204) {
+                    document.getElementById("result").innerHTML = "✅ E-mail succesvol bijgewerkt!";
+                } else {
+                    throw new Error("❌ Fout bij het bijwerken van de e-mail.");
+                }
+            })
+            .catch(error => {
+                document.getElementById("result").innerHTML = error.message;
+            });
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Controleer of de gebruiker is ingelogd
+        if (!localStorage.getItem("authToken")) {
+            alert("Je bent niet ingelogd. Log opnieuw in.");
+            window.location.href = "login.html";
+        }
+    });
+</script>
+
+</body>
+</html>
